@@ -1,9 +1,8 @@
 import unittest
 
 from ansiblelint.rules import RulesCollection
-from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import (
-    UseHandlerRatherThanWhenChangedRule,
-)
+from ansiblelint.rules.UseHandlerRatherThanWhenChangedRule import \
+    UseHandlerRatherThanWhenChangedRule
 from ansiblelint.runner import Runner
 
 
