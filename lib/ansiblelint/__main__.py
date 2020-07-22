@@ -23,6 +23,7 @@
 import errno
 import logging
 import pathlib
+import os
 import sys
 from typing import Any, Set
 
@@ -117,6 +118,12 @@ def main() -> int:
 
     for match in sorted(matches):
         print(formatter.format(match, options.colored))
+
+    # If run under GitHub Actions we also want to emit output recognized by it.
+    if os.getenv('GITHUB_WORKFLOW'):
+        formatter = formatters.AnnotationsFormatter(cwd, options.display_relative_path)
+        for match in sorted(matches):
+            print(formatter.format(match))
 
     if matches:
         return 2

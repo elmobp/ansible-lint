@@ -15,7 +15,7 @@ class BaseFormatter:
         display_relative_path (bool): whether to show path as relative or absolute
     """
 
-    def __init__(self, base_dir, display_relative_path):
+    def __init__(self, base_dir=str, display_relative_path=True) -> None:
         """Initialize a BaseFormatter instance."""
         if isinstance(base_dir, str):
             base_dir = Path(base_dir)
@@ -85,6 +85,33 @@ class ParseableFormatter(BaseFormatter):
                                     match.linenumber,
                                     "E" + match.rule.id,
                                     match.message)
+
+
+class AnnotationsFormatter(BaseFormatter):
+    # https://docs.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
+    """Emits errors in format that is recognized by Github Annotation parsing.
+
+    ::warning file={name},line={line},col={col}::{message}
+
+    Supported levels: debug, warning, error
+    """
+
+    def format(self, match, colored=False):
+        formatstr = u"::{0} file={1},line={2}::[{3}] {4}"
+        return formatstr.format(
+            self.severity_to_level(match.rule.severity),
+            self._format_path(match.filename),
+            match.linenumber,
+            "E" + match.rule.id,
+            match.message)
+
+    def severity_to_level(self, severity: str) -> str:
+        if severity in ['VERY_LOW', 'LOW']:
+            return 'warning'
+        elif severity in ['INFO']:
+            return 'debug'
+        # ['MEDIUM', 'HIGH', 'VERY_HIGH'] or anything else
+        return 'error'
 
 
 class ParseableSeverityFormatter(BaseFormatter):
